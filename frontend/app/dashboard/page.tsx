@@ -9,15 +9,25 @@ interface LocatorResult {
     locator: string;
 }
 
+interface AuthWarning {
+    warning: string;
+    redirectedTo: string;
+    hint: string;
+    results: [];
+}
+
 export default function DashboardPage() {
     const { user, token, logout, isLoading } = useAuth();
     const router = useRouter();
     const [url, setUrl] = useState('');
     const [keyword, setKeyword] = useState('');
     const [locatorType, setLocatorType] = useState('xpath');
+    const [cookies, setCookies] = useState('');
+    const [showCookies, setShowCookies] = useState(false);
     const [results, setResults] = useState<LocatorResult[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
+    const [authWarning, setAuthWarning] = useState<AuthWarning | null>(null);
     const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
     useEffect(() => {
@@ -31,6 +41,7 @@ export default function DashboardPage() {
         setIsGenerating(true);
         setError('');
         setResults([]);
+        setAuthWarning(null);
 
         try {
             const res = await fetch('http://localhost:3001/locator/generate', {
@@ -39,11 +50,19 @@ export default function DashboardPage() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ url, keyword, locatorType }),
+                body: JSON.stringify({ url, keyword, locatorType, cookies: cookies || undefined }),
             });
             const data = await res.json();
             if (res.ok) {
-                setResults(data);
+                // Check if the response is an auth warning
+                if (data.warning) {
+                    setAuthWarning(data);
+                    setShowCookies(true); // Auto-show cookies field
+                } else if (Array.isArray(data)) {
+                    setResults(data);
+                } else {
+                    setResults([]);
+                }
             } else {
                 setError(data.message || 'Generation failed');
             }
@@ -116,6 +135,32 @@ export default function DashboardPage() {
                             <option value="styles">Styles</option>
                         </select>
                     </div>
+
+                    {/* Cookies toggle and input */}
+                    <div className="md:col-span-4">
+                        <button
+                            type="button"
+                            onClick={() => setShowCookies(!showCookies)}
+                            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                        >
+                            <span>{showCookies ? '▼' : '▶'}</span>
+                            🔒 Cookies (for login-protected pages)
+                        </button>
+                        {showCookies && (
+                            <div className="mt-2 space-y-1">
+                                <textarea
+                                    placeholder="Paste cookies from browser: Open target site → F12 → Console → type document.cookie → copy the result"
+                                    className="block w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-slate-200 focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-sm font-mono h-20 resize-y"
+                                    value={cookies}
+                                    onChange={(e) => setCookies(e.target.value)}
+                                />
+                                <p className="text-xs text-slate-600">
+                                    Format: name=value; name2=value2 (copied from document.cookie)
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="md:col-span-4 mt-4">
                         <button
                             type="submit"
@@ -136,6 +181,18 @@ export default function DashboardPage() {
             {error && (
                 <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-lg flex items-center justify-center">
                     {error}
+                </div>
+            )}
+
+            {authWarning && (
+                <div className="bg-amber-500/10 border border-amber-500/50 text-amber-300 p-5 rounded-lg space-y-2">
+                    <div className="flex items-center gap-2 font-semibold">
+                        <span className="text-lg">🔒</span> {authWarning.warning}
+                    </div>
+                    <p className="text-sm text-amber-400/80">
+                        Redirected to: <code className="bg-slate-800/50 px-2 py-0.5 rounded text-xs">{authWarning.redirectedTo}</code>
+                    </p>
+                    <p className="text-sm text-amber-400/80">{authWarning.hint}</p>
                 </div>
             )}
 
@@ -175,7 +232,7 @@ export default function DashboardPage() {
                         ))}
                     </div>
                 ) : (
-                    !isGenerating && !error && (
+                    !isGenerating && !error && !authWarning && (
                         <div className="glass p-12 text-center text-slate-500 border-dashed border-2">
                             Enter a URL and keyword above to start scan
                         </div>
