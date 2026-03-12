@@ -13,6 +13,7 @@ interface AuthWarning {
     warning: string;
     redirectedTo: string;
     hint: string;
+    loginError?: string;
     results: [];
 }
 
@@ -234,14 +235,29 @@ export default function DashboardPage() {
             )}
 
             {authWarning && (
-                <div className="bg-amber-500/10 border border-amber-500/50 text-amber-300 p-5 rounded-lg space-y-2">
-                    <div className="flex items-center gap-2 font-semibold">
-                        <span className="text-lg">🔒</span> {authWarning.warning}
+                <div className={`p-5 rounded-lg space-y-3 ${
+                    authWarning.loginError
+                        ? 'bg-red-500/10 border border-red-500/50'
+                        : 'bg-amber-500/10 border border-amber-500/50'
+                }`}>
+                    <div className={`flex items-center gap-2 font-semibold ${
+                        authWarning.loginError ? 'text-red-300' : 'text-amber-300'
+                    }`}>
+                        <span className="text-lg">{authWarning.loginError ? '❌' : '🔒'}</span>
+                        {authWarning.warning}
                     </div>
-                    <p className="text-sm text-amber-400/80">
+                    {authWarning.loginError && (
+                        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                            <p className="text-sm text-red-300 font-medium">Site Error Message:</p>
+                            <p className="text-sm text-red-200 mt-1">{authWarning.loginError}</p>
+                        </div>
+                    )}
+                    <p className="text-sm text-slate-400">
                         Redirected to: <code className="bg-slate-800/50 px-2 py-0.5 rounded text-xs">{authWarning.redirectedTo}</code>
                     </p>
-                    <p className="text-sm text-amber-400/80">{authWarning.hint}</p>
+                    {!authWarning.loginError && (
+                        <p className="text-sm text-amber-400/80">{authWarning.hint}</p>
+                    )}
                 </div>
             )}
 

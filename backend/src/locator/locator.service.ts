@@ -139,9 +139,10 @@ export class LocatorService {
 
     /**
      * Attempt to auto-login on a login page by finding and filling credential fields.
-     * Returns true if login appeared successful (page navigated away from login).
+     * Returns { success: true } if login succeeded, or { success: false, errorMessage } with
+     * any error text scraped from the login page.
      */
-    private async attemptAutoLogin(page: Page, username: string, password: string, originalUrl: string): Promise<boolean> {
+    private async attemptAutoLogin(page: Page, username: string, password: string, originalUrl: string): Promise<{ success: boolean; errorMessage?: string }> {
         console.log('[Locator] Attempting auto-login...');
 
         try {
@@ -211,11 +212,10 @@ export class LocatorService {
 
             if (!usernameFilled) {
                 console.log('[Locator] Could not find username/email field');
-                return false;
+                return { success: false, errorMessage: 'Could not find the login form on this page. The email/username field was not detected.' };
             }
 
             // Some login flows show password on a second step (after entering email)
-            // Try clicking "Next" or "Continue" if password field is not visible yet
             let passwordVisible = false;
             for (const sel of passwordSelectors) {
                 const field = page.locator(sel).first();
@@ -226,7 +226,6 @@ export class LocatorService {
             }
 
             if (!passwordVisible) {
-                // Try clicking a "Next" or "Continue" button
                 for (const sel of ['button:has-text("Next")', 'button:has-text("Continue")', 'button[type="submit"]']) {
                     const btn = page.locator(sel).first();
                     if (await btn.isVisible({ timeout: 500 }).catch(() => false)) {
@@ -253,7 +252,7 @@ export class LocatorService {
 
             if (!passwordFilled) {
                 console.log('[Locator] Could not find password field');
-                return false;
+                return { success: false, errorMessage: 'Could not find the password field on the login page.' };
             }
 
             // Click the submit/login button
@@ -270,7 +269,6 @@ export class LocatorService {
                 }
             }
 
-            // Fallback: press Enter on the password field
             if (!submitted) {
                 console.log('[Locator] No submit button found, pressing Enter...');
                 await page.keyboard.press('Enter');
@@ -282,7 +280,6 @@ export class LocatorService {
                     timeout: 10000,
                 });
             } catch {
-                // If waitForURL fails, just wait a bit and check
                 await page.waitForTimeout(3000);
             }
 
@@ -294,19 +291,84 @@ export class LocatorService {
 
             if (loginSucceeded) {
                 console.log(`[Locator] Login succeeded! Now on: ${afterLoginUrl}`);
-
-                // Navigate to the original target URL
                 console.log(`[Locator] Navigating to target URL: ${originalUrl}`);
                 await this.navigateWithFallback(page, originalUrl);
                 await page.waitForTimeout(3000);
-                return true;
+                return { success: true };
             } else {
-                console.log(`[Locator] Login may have failed. Still on: ${afterLoginUrl}`);
-                return false;
+                // Login failed — scrape error messages from the page
+                const errorMessage = await page.evaluate(() => {
+                    // Common selectors for login error messages
+                    const errorSelectors = [
+                        '[role="alert"]',
+                        '[aria-live="polite"]',
+                        '[aria-live="assertive"]',
+                        '.error', '.error-message', '.error-text',
+                        '.alert-error', '.alert-danger', '.alert-warning',
+                        '[class*="error"]',
+                        '[class*="Error"]',
+                        '[class*="alert"]',
+                        '[class*="toast"]',
+                        '[class*="notification"]',
+                        '[class*="invalid"]',
+                        '[class*="warning"]',
+                        '[data-testid*="error"]',
+                        '.text-red', '[class*="text-red"]',
+                        '.text-danger', '[class*="danger"]',
+                        'p.error', 'span.error', 'div.error',
+                        'form .help-block',
+                        '.form-error', '.field-error',
+                        '.Toastify__toast--error',
+                        '[class*="snackbar"]',
+                    ];
+
+                    const messages: string[] = [];
+
+                    for (const sel of errorSelectors) {
+                        try {
+                            const els = document.querySelectorAll(sel);
+                            els.forEach(el => {
+                                const text = (el as HTMLElement).innerText?.trim();
+                                if (text && text.length > 0 && text.length < 300 &&
+                                    !messages.includes(text)) {
+                                    messages.push(text);
+                                }
+                            });
+                        } catch { }
+                    }
+
+                    // Also check for any recently appeared elements with red/error styling
+                    if (messages.length === 0) {
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            try {
+                                const style = window.getComputedStyle(el);
+                                const color = style.color;
+                                // Check for red-ish text color
+                                if (color && (color.includes('rgb(2') || color.includes('rgb(1')) && color.includes(', 0,') || color.includes(',0,')) {
+                                    const text = (el as HTMLElement).innerText?.trim();
+                                    if (text && text.length > 3 && text.length < 200 &&
+                                        el.children.length < 3 &&
+                                        !messages.includes(text)) {
+                                        messages.push(text);
+                                    }
+                                }
+                            } catch { }
+                        });
+                    }
+
+                    return messages.length > 0 ? messages.join(' | ') : '';
+                });
+
+                console.log(`[Locator] Login failed. Error messages found: ${errorMessage || 'none'}`);
+                return {
+                    success: false,
+                    errorMessage: errorMessage || 'Login failed. The page did not navigate away from the login screen. Please check your credentials.',
+                };
             }
         } catch (error) {
             console.log(`[Locator] Auto-login error: ${(error as Error).message}`);
-            return false;
+            return { success: false, errorMessage: `Login error: ${(error as Error).message}` };
         }
     }
 
@@ -644,13 +706,16 @@ export class LocatorService {
             }
 
             // Auto-login: if redirected to login and we have username/password, try to log in
+            let loginError = '';
             if (wasRedirected && siteUsername && sitePassword &&
                 (finalUrl.includes('login') || finalUrl.includes('signin') || finalUrl.includes('auth'))) {
-                const loginSuccess = await this.attemptAutoLogin(page, siteUsername, sitePassword, url);
-                if (loginSuccess) {
+                const loginResult = await this.attemptAutoLogin(page, siteUsername, sitePassword, url);
+                if (loginResult.success) {
                     // Re-check after login
                     finalUrl = page.url();
                     wasRedirected = finalUrl !== url && !finalUrl.startsWith(url);
+                } else {
+                    loginError = loginResult.errorMessage || 'Login failed';
                 }
             }
 
@@ -777,12 +842,18 @@ export class LocatorService {
 
                 // Return helpful warning if redirected
                 if (wasRedirected && (finalUrl.includes('login') || finalUrl.includes('signin') || finalUrl.includes('auth'))) {
-                    return {
-                        warning: 'This page requires authentication. The browser was redirected to a login page.',
+                    const response: any = {
+                        warning: loginError
+                            ? 'Login failed. Please check your credentials.'
+                            : 'This page requires authentication. The browser was redirected to a login page.',
                         redirectedTo: finalUrl,
-                        hint: 'Use the 🔒 Authentication section to provide your site login credentials (username & password). The tool will automatically log in and scan the page.',
+                        hint: loginError || 'Use the 🔒 Authentication section to provide your site login credentials (username & password). The tool will automatically log in and scan the page.',
                         results: [],
                     };
+                    if (loginError) {
+                        response.loginError = loginError;
+                    }
+                    return response;
                 }
             }
 
