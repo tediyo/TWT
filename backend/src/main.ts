@@ -1,5 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as path from 'path';
+
+// Force Playwright to look for browsers inside the downloaded project folder
+process.env.PLAYWRIGHT_BROWSERS_PATH = path.join(process.cwd(), 'pw-browsers');
 
 async function bootstrap() {
   try {
