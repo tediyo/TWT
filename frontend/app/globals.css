@@ -1,21 +1,68 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Light theme (default) ── */
 :root {
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-hover: rgba(0, 0, 0, 0.05);
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --muted: #64748b;
+  --muted-strong: #334155;
+  --code-bg: rgba(0, 0, 0, 0.05);
+  --tag-bg: #e2e8f0;
+  --tag-text: #4338ca;
+  --badge-bg: rgba(99, 102, 241, 0.1);
+  --badge-text: #4f46e5;
+  --copy-btn-bg: rgba(0, 0, 0, 0.05);
+  --copy-btn-hover-bg: #6366f1;
+  --copy-btn-text: #475569;
+  --copy-btn-hover-text: #ffffff;
+  --empty-border: #cbd5e1;
+}
+
+/* ── Dark theme ── */
+.dark {
   --background: #0f172a;
   --foreground: #f8fafc;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-hover: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(30, 41, 59, 0.5);
+  --input-border: #334155;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --muted: #94a3b8;
+  --muted-strong: #cbd5e1;
+  --code-bg: rgba(15, 23, 42, 0.5);
+  --tag-bg: #334155;
+  --tag-text: #a5b4fc;
+  --badge-bg: rgba(99, 102, 241, 0.2);
+  --badge-text: #818cf8;
+  --copy-btn-bg: rgba(51, 65, 85, 0.5);
+  --copy-btn-hover-bg: #6366f1;
+  --copy-btn-text: #cbd5e1;
+  --copy-btn-hover-text: #ffffff;
+  --empty-border: #334155;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: inherit;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: 1rem;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-primary {
@@ -26,4 +73,30 @@ body {
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--foreground);
+  transform: rotate(15deg);
+}
+
+/* Smooth transitions for theme-aware elements */
+input, textarea, select, code, pre {
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }

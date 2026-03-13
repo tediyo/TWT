@@ -20,18 +20,21 @@ export class AuthService {
             email,
             password: hashedPassword,
         });
-        const { password, ...result } = user;
-        return result;
+        return {
+            id: user._id.toString(),
+            email: user.email,
+            createdAt: (user as any).createdAt,
+        };
     }
 
     async login(email: string, pass: string) {
         const user = await this.usersService.findOneByEmail(email);
         if (user && (await bcrypt.compare(pass, user.password))) {
-            const payload = { email: user.email, sub: user.id };
+            const payload = { email: user.email, sub: user._id.toString() };
             return {
                 access_token: this.jwtService.sign(payload),
                 user: {
-                    id: user.id,
+                    id: user._id.toString(),
                     email: user.email,
                 },
             };

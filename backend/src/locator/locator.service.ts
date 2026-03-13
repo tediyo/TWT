@@ -1,16 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { chromium, Page, Frame } from 'playwright';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { SearchHistory } from './search-history.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { SearchHistory, SearchHistoryDocument } from './search-history.schema';
 import * as path from 'path';
 import * as fs from 'fs';
 
 @Injectable()
 export class LocatorService {
     constructor(
-        @InjectRepository(SearchHistory)
-        private searchHistoryRepository: Repository<SearchHistory>,
+        @InjectModel(SearchHistory.name)
+        private searchHistoryModel: Model<SearchHistoryDocument>,
     ) { }
 
     /**
@@ -663,7 +663,7 @@ export class LocatorService {
         return allResults;
     }
 
-    async generateLocators(url: string, keyword: string, locatorType: string, userId: number, cookies?: string, authToken?: string, siteUsername?: string, sitePassword?: string) {
+    async generateLocators(url: string, keyword: string, locatorType: string, userId: string, cookies?: string, authToken?: string, siteUsername?: string, sitePassword?: string) {
         let browser;
         try {
             // Parse cookies if provided (format: "name=value; name2=value2")
@@ -891,14 +891,14 @@ export class LocatorService {
             }).filter(l => l.locator && l.locator.trim() !== '');
 
             // Save to history
-            const history = this.searchHistoryRepository.create({
+            const history = new this.searchHistoryModel({
                 url,
                 keyword,
                 locatorType,
                 results: locators,
-                user: { id: userId } as any,
+                user: userId,
             });
-            await this.searchHistoryRepository.save(history);
+            await history.save();
 
             return locators;
         } catch (error) {
@@ -955,10 +955,7 @@ export class LocatorService {
         }
     }
 
-    async getHistory(userId: number) {
-        return this.searchHistoryRepository.find({
-            where: { user: { id: userId } },
-            order: { createdAt: 'DESC' },
-        });
+    async getHistory(userId: string) {
+        return this.searchHistoryModel.find({ user: userId }).sort({ createdAt: -1 }).exec();
     }
 }

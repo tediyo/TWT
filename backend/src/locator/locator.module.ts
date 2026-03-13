@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { LocatorService } from './locator.service';
 import { LocatorController } from './locator.controller';
-import { SearchHistory } from './search-history.entity';
+import { SearchHistory, SearchHistorySchema } from './search-history.schema';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SearchHistory])],
+  imports: [MongooseModule.forFeature([{ name: SearchHistory.name, schema: SearchHistorySchema }])],
   providers: [LocatorService],
   controllers: [LocatorController],
 })
