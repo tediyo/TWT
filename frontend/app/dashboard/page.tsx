@@ -105,7 +105,7 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
             <header className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-indigo-500 dark:text-indigo-400">QA Locator Tool</h1>
+                    <h1 className="text-2xl font-bold text-amber-500 dark:text-amber-400">QA Locator Tool</h1>
                     <p className="text-sm" style={{ color: 'var(--muted)' }}>Welcome back, {user.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ export default function DashboardPage() {
                             type="url"
                             required
                             placeholder="https://example.com"
-                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none"
                             style={inputStyle}
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                             type="text"
                             required
                             placeholder="e.g. Email"
-                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none"
                             style={inputStyle}
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                     <div className="space-y-2">
                         <label className="text-xs font-semibold uppercase" style={{ color: 'var(--muted)' }}>Copy As</label>
                         <select
-                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none"
+                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none appearance-none"
                             style={inputStyle}
                             value={locatorType}
                             onChange={(e) => setLocatorType(e.target.value)}
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                         <button
                             type="button"
                             onClick={() => setShowAuth(!showAuth)}
-                            className="text-xs text-indigo-500 hover:text-indigo-400 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors flex items-center gap-1"
+                            className="text-xs text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300 transition-colors flex items-center gap-1"
                         >
                             <span>{showAuth ? '▼' : '▶'}</span>
                             🔒 Authentication (for login-protected pages)
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                                         <input
                                             type="text"
                                             placeholder="your@email.com"
-                                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-sm"
+                                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none text-sm"
                                             style={inputStyle}
                                             value={siteUsername}
                                             onChange={(e) => setSiteUsername(e.target.value)}
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                                         <input
                                             type="password"
                                             placeholder="••••••••"
-                                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-sm"
+                                            className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none text-sm"
                                             style={inputStyle}
                                             value={sitePassword}
                                             onChange={(e) => setSitePassword(e.target.value)}
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                                             <label className="text-xs font-semibold uppercase" style={{ color: 'var(--muted)' }}>Cookies</label>
                                             <textarea
                                                 placeholder="Paste cookies from browser: F12 → Console → document.cookie"
-                                                className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-sm font-mono h-16 resize-y"
+                                                className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none text-sm font-mono h-16 resize-y"
                                                 style={inputStyle}
                                                 value={cookies}
                                                 onChange={(e) => setCookies(e.target.value)}
@@ -239,7 +239,7 @@ export default function DashboardPage() {
                                             <label className="text-xs font-semibold uppercase" style={{ color: 'var(--muted)' }}>Authorization Token</label>
                                             <textarea
                                                 placeholder="Bearer eyJhbGciOiJIUzI1NiIs..."
-                                                className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-sm font-mono h-16 resize-y"
+                                                className="block w-full border rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-all outline-none text-sm font-mono h-16 resize-y"
                                                 style={inputStyle}
                                                 value={authToken}
                                                 onChange={(e) => setAuthToken(e.target.value)}
@@ -255,11 +255,11 @@ export default function DashboardPage() {
                         <button
                             type="submit"
                             disabled={isGenerating}
-                            className="w-full btn-primary text-white font-bold py-3 rounded-xl transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full btn-primary font-bold py-3 rounded-xl transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {isGenerating ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                                     Scanning Page...
                                 </>
                             ) : 'Generate Locators'}
@@ -343,13 +343,7 @@ export default function DashboardPage() {
                             </div>
                         ))}
                     </div>
-                ) : (
-                    !isGenerating && !error && !authWarning && (
-                        <div className="glass p-12 text-center border-dashed border-2" style={{ borderColor: 'var(--empty-border)', color: 'var(--muted)' }}>
-                            Enter a URL and keyword above to start scan
-                        </div>
-                    )
-                )}
+                ) : null}
             </section>
         </div>
     );

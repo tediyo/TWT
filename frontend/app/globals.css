@@ -4,50 +4,54 @@
 
 /* ── Light theme (default) ── */
 :root {
-  --background: #f1f5f9;
+  --background: #ffffff;
   --foreground: #0f172a;
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface-hover: rgba(0, 0, 0, 0.05);
-  --input-bg: #ffffff;
-  --input-border: #cbd5e1;
-  --glass-bg: rgba(255, 255, 255, 0.7);
+  --surface: rgba(0, 0, 0, 0.03);
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --input-bg: #f8f9fa;
+  --input-border: #d1d5db;
+  --glass-bg: rgba(0, 0, 0, 0.02);
   --glass-border: rgba(0, 0, 0, 0.08);
-  --muted: #64748b;
-  --muted-strong: #334155;
-  --code-bg: rgba(0, 0, 0, 0.05);
-  --tag-bg: #e2e8f0;
-  --tag-text: #4338ca;
-  --badge-bg: rgba(99, 102, 241, 0.1);
-  --badge-text: #4f46e5;
+  --muted: #6b7280;
+  --muted-strong: #374151;
+  --code-bg: rgba(0, 0, 0, 0.04);
+  --tag-bg: #fef3c7;
+  --tag-text: #92400e;
+  --badge-bg: rgba(245, 158, 11, 0.1);
+  --badge-text: #d97706;
   --copy-btn-bg: rgba(0, 0, 0, 0.05);
-  --copy-btn-hover-bg: #6366f1;
+  --copy-btn-hover-bg: #f59e0b;
   --copy-btn-text: #475569;
-  --copy-btn-hover-text: #ffffff;
-  --empty-border: #cbd5e1;
+  --copy-btn-hover-text: #000000;
+  --empty-border: #d1d5db;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
 }
 
 /* ── Dark theme ── */
 .dark {
-  --background: #0f172a;
+  --background: #000000;
   --foreground: #f8fafc;
-  --surface: rgba(255, 255, 255, 0.05);
+  --surface: rgba(255, 255, 255, 0.06);
   --surface-hover: rgba(255, 255, 255, 0.1);
-  --input-bg: rgba(30, 41, 59, 0.5);
-  --input-border: #334155;
-  --glass-bg: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.04);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --muted: #94a3b8;
-  --muted-strong: #cbd5e1;
-  --code-bg: rgba(15, 23, 42, 0.5);
-  --tag-bg: #334155;
-  --tag-text: #a5b4fc;
-  --badge-bg: rgba(99, 102, 241, 0.2);
-  --badge-text: #818cf8;
-  --copy-btn-bg: rgba(51, 65, 85, 0.5);
-  --copy-btn-hover-bg: #6366f1;
-  --copy-btn-text: #cbd5e1;
-  --copy-btn-hover-text: #ffffff;
-  --empty-border: #334155;
+  --muted: #9ca3af;
+  --muted-strong: #d1d5db;
+  --code-bg: rgba(255, 255, 255, 0.05);
+  --tag-bg: rgba(245, 158, 11, 0.15);
+  --tag-text: #fbbf24;
+  --badge-bg: rgba(245, 158, 11, 0.15);
+  --badge-text: #fbbf24;
+  --copy-btn-bg: rgba(255, 255, 255, 0.08);
+  --copy-btn-hover-bg: #f59e0b;
+  --copy-btn-text: #d1d5db;
+  --copy-btn-hover-text: #000000;
+  --empty-border: rgba(255, 255, 255, 0.12);
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
 }
 
 body {
@@ -66,13 +70,15 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+  color: #000000;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -3px rgba(245, 158, 11, 0.3), 0 4px 6px -2px rgba(245, 158, 11, 0.15);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
 }
 
 /* Theme toggle button */
