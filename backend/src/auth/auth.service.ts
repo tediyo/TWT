@@ -10,19 +10,22 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
-    async register(email: string, pass: string) {
+    async register(email: string, pass: string, fullName: string, phoneNumber?: string) {
         const existingUser = await this.usersService.findOneByEmail(email);
         if (existingUser) {
             throw new ConflictException('Email already exists');
         }
         const hashedPassword = await bcrypt.hash(pass, 10);
         const user = await this.usersService.create({
+            fullName,
             email,
+            phoneNumber,
             password: hashedPassword,
         });
         return {
             id: user._id.toString(),
             email: user.email,
+            fullName: user.fullName,
             createdAt: (user as any).createdAt,
         };
     }

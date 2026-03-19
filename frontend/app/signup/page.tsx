@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignupPage() {
+    const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -19,7 +21,7 @@ export default function SignupPage() {
             const res = await fetch(`${apiUrl}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ fullName, email, phoneNumber: phoneNumber || undefined, password }),
             });
             const data = await res.json();
             if (res.ok) {
@@ -53,14 +55,38 @@ export default function SignupPage() {
                     <>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
+                                <label className="block text-sm font-medium" style={{ color: 'var(--muted-strong)' }}>Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="Enter your full name"
+                                    className="mt-1 block w-full rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 p-2"
+                                    style={{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--foreground)' }}
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                />
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium" style={{ color: 'var(--muted-strong)' }}>Email</label>
                                 <input
                                     type="email"
                                     required
+                                    placeholder="Enter your email"
                                     className="mt-1 block w-full rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 p-2"
                                     style={{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--foreground)' }}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium" style={{ color: 'var(--muted-strong)' }}>Phone Number <span className="text-xs font-normal" style={{ color: 'var(--muted)' }}>(optional)</span></label>
+                                <input
+                                    type="tel"
+                                    placeholder="Enter your phone number"
+                                    className="mt-1 block w-full rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 p-2"
+                                    style={{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', color: 'var(--foreground)' }}
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
                                 />
                             </div>
                             <div>
