@@ -5,18 +5,18 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function HomePage() {
-  const { user, isLoading } = useAuth();
+  const { user, isGuest, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading) {
-      if (user) {
+      if (user || isGuest) {
         router.push('/dashboard');
       } else {
         router.push('/login');
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, isGuest, isLoading, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -24,3 +24,4 @@ export default function HomePage() {
     </div>
   );
 }
+

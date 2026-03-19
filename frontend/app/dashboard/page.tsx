@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 interface LocatorResult {
     tag: string;
@@ -18,8 +20,16 @@ interface AuthWarning {
     results: [];
 }
 
-export default function DashboardPage() {
-    const { user, token, logout, isLoading } = useAuth();
+export default function DashboardPageWrapper() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center" style={{ color: 'var(--muted)' }}>Loading application...</div>}>
+            <DashboardPage />
+        </Suspense>
+    );
+}
+
+function DashboardPage() {
+    const { user, token, isGuest, logout, isLoading } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const router = useRouter();
     const [url, setUrl] = useState('');
@@ -35,12 +45,26 @@ export default function DashboardPage() {
     const [error, setError] = useState('');
     const [authWarning, setAuthWarning] = useState<AuthWarning | null>(null);
     const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        if (!isLoading && !user) {
+        if (!isLoading && !user && !isGuest) {
             router.push('/login');
         }
-    }, [user, isLoading, router]);
+    }, [user, isGuest, isLoading, router]);
+
+    // Parse URL parameters for "Re-run" functionality from history
+    useEffect(() => {
+        const rerunUrl = searchParams.get('url');
+        const rerunKeyword = searchParams.get('keyword');
+        const rerunType = searchParams.get('type');
+        
+        if (rerunUrl) setUrl(rerunUrl);
+        if (rerunKeyword) setKeyword(rerunKeyword);
+        if (rerunType) setLocatorType(rerunType);
+    }, [searchParams]);
+
+
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,7 +79,7 @@ export default function DashboardPage() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify({
                     url, keyword, locatorType,
@@ -93,7 +117,7 @@ export default function DashboardPage() {
 
     const isMultiLine = locatorType === 'styles' || locatorType === 'outerhtml' || locatorType === 'element';
 
-    if (isLoading || !user) return <div className="p-8 text-center" style={{ color: 'var(--muted)' }}>Loading...</div>;
+    if (isLoading || (!user && !isGuest)) return <div className="p-8 text-center" style={{ color: 'var(--muted)' }}>Loading...</div>;
 
     const inputStyle = {
         background: 'var(--input-bg)',
@@ -103,10 +127,19 @@ export default function DashboardPage() {
 
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
-            <header className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-amber-500 dark:text-amber-400">QA Locator Tool</h1>
-                    <p className="text-sm" style={{ color: 'var(--muted)' }}>Welcome back, {user.email}</p>
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-2xl font-bold text-amber-500 dark:text-amber-400">QA Locator Tool</h1>
+                        {!isGuest && token && (
+                            <Link href="/history" className="text-sm bg-transparent border border-amber-500/30 text-amber-500 hover:bg-amber-500/10 dark:hover:bg-amber-500/20 px-3 py-1 rounded-lg flex items-center gap-2 transition-colors font-medium">
+                                <span className="text-lg leading-none">🕒</span> History
+                            </Link>
+                        )}
+                    </div>
+                    <p className="text-sm" style={{ color: 'var(--muted)' }}>
+                        {isGuest ? 'Welcome, Guest' : `Welcome back, ${user?.email}`}
+                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -137,6 +170,17 @@ export default function DashboardPage() {
                     </button>
                 </div>
             </header>
+
+            {isGuest && (
+                <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: 'var(--badge-bg)', border: '1px solid var(--glass-border)' }}>
+                    <p className="text-sm" style={{ color: 'var(--muted-strong)' }}>
+                        👤 You&apos;re using guest mode. <span style={{ color: 'var(--muted)' }}>Sign up to save your search history.</span>
+                    </p>
+                    <a href="/signup" className="text-sm font-semibold text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300 transition-colors whitespace-nowrap ml-4">
+                        Sign Up →
+                    </a>
+                </div>
+            )}
 
             <section className="glass p-6 md:p-8 shadow-xl">
                 <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -345,6 +389,8 @@ export default function DashboardPage() {
                     </div>
                 ) : null}
             </section>
+
+
         </div>
     );
 }

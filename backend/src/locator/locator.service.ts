@@ -913,15 +913,17 @@ export class LocatorService {
                 return { tag: el.tag, locator };
             }).filter(l => l.locator && l.locator.trim() !== '');
 
-            // Save to history
-            const history = new this.searchHistoryModel({
-                url,
-                keyword,
-                locatorType,
-                results: locators,
-                user: userId,
-            });
-            await history.save();
+            // Save to history (only for authenticated users)
+            if (userId) {
+                const history = new this.searchHistoryModel({
+                    url,
+                    keyword,
+                    locatorType,
+                    results: locators,
+                    user: userId,
+                });
+                await history.save();
+            }
 
             return locators;
         } catch (error) {
@@ -980,5 +982,13 @@ export class LocatorService {
 
     async getHistory(userId: string) {
         return this.searchHistoryModel.find({ user: userId }).sort({ createdAt: -1 }).exec();
+    }
+
+    async deleteHistory(id: string, userId: string): Promise<any> {
+        return this.searchHistoryModel.deleteOne({ _id: id, user: userId }).exec();
+    }
+
+    async clearHistory(userId: string): Promise<any> {
+        return this.searchHistoryModel.deleteMany({ user: userId }).exec();
     }
 }

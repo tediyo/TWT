@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SignupPage() {
     const [fullName, setFullName] = useState('');
@@ -12,6 +13,7 @@ export default function SignupPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const router = useRouter();
+    const { loginAsGuest } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -145,6 +147,15 @@ export default function SignupPage() {
                 )}
                 <p className="text-center text-sm" style={{ color: 'var(--muted)' }}>
                     Already have an account? <Link href="/login" className="text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300">Log in</Link>
+                </p>
+                <p className="text-center text-sm" style={{ color: 'var(--muted)' }}>
+                    or{' '}
+                    <button
+                        onClick={loginAsGuest}
+                        className="text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300 underline cursor-pointer bg-transparent border-none font-inherit text-sm"
+                    >
+                        Continue as Guest
+                    </button>
                 </p>
             </div>
         </div>
