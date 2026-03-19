@@ -20,6 +20,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper to prevent SecurityError crashes
+const safeStorage = {
+    getItem: (type: 'local' | 'session', key: string) => {
+        if (typeof window === 'undefined') return null;
+        try { return type === 'local' ? window.localStorage.getItem(key) : window.sessionStorage.getItem(key); } catch (e) { return null; }
+    },
+    setItem: (type: 'local' | 'session', key: string, value: string) => {
+        if (typeof window === 'undefined') return;
+        try { type === 'local' ? window.localStorage.setItem(key, value) : window.sessionStorage.setItem(key, value); } catch (e) {}
+    },
+    removeItem: (type: 'local' | 'session', key: string) => {
+        if (typeof window === 'undefined') return;
+        try { type === 'local' ? window.localStorage.removeItem(key) : window.sessionStorage.removeItem(key); } catch (e) {}
+    }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
@@ -28,9 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const router = useRouter();
 
     useEffect(() => {
-        const savedToken = localStorage.getItem('token');
-        const savedUser = localStorage.getItem('user');
-        const savedGuest = sessionStorage.getItem('isGuest');
+        const savedToken = safeStorage.getItem('local', 'token');
+        const savedUser = safeStorage.getItem('local', 'user');
+        const savedGuest = safeStorage.getItem('session', 'isGuest');
         if (savedToken && savedUser) {
             setToken(savedToken);
             setUser(JSON.parse(savedUser));
@@ -44,9 +60,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(newToken);
         setUser(newUser);
         setIsGuest(false);
-        localStorage.setItem('token', newToken);
-        localStorage.setItem('user', JSON.stringify(newUser));
-        sessionStorage.removeItem('isGuest');
+        safeStorage.setItem('local', 'token', newToken);
+        safeStorage.setItem('local', 'user', JSON.stringify(newUser));
+        safeStorage.removeItem('session', 'isGuest');
         router.push('/dashboard');
     };
 
@@ -54,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         setUser(null);
         setIsGuest(true);
-        sessionStorage.setItem('isGuest', 'true');
+        safeStorage.setItem('session', 'isGuest', 'true');
         router.push('/dashboard');
     };
 
@@ -62,9 +78,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         setUser(null);
         setIsGuest(false);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        sessionStorage.removeItem('isGuest');
+        safeStorage.removeItem('local', 'token');
+        safeStorage.removeItem('local', 'user');
+        safeStorage.removeItem('session', 'isGuest');
         router.push('/login');
     };
 

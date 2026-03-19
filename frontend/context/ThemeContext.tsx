@@ -11,12 +11,24 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Helper to prevent SecurityError crashes when cookies are blocked
+const safeStorage = {
+    getItem: (key: string) => {
+        if (typeof window === 'undefined') return null;
+        try { return window.localStorage.getItem(key); } catch (e) { return null; }
+    },
+    setItem: (key: string, value: string) => {
+        if (typeof window === 'undefined') return;
+        try { window.localStorage.setItem(key, value); } catch (e) {}
+    }
+};
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [theme, setTheme] = useState<Theme>('dark');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem('theme') as Theme | null;
+        const saved = safeStorage.getItem('theme') as Theme | null;
         if (saved) {
             setTheme(saved);
         } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
@@ -33,7 +45,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         } else {
             root.classList.remove('dark');
         }
-        localStorage.setItem('theme', theme);
+        safeStorage.setItem('theme', theme);
     }, [theme, mounted]);
 
     const toggleTheme = () => {
