@@ -56,12 +56,14 @@ export default function HistoryPage() {
 
     if (isGuest) {
         return (
-            <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 text-center">
-                <h1 className="text-3xl font-bold text-amber-500 mb-4">Search History</h1>
-                <p style={{ color: 'var(--muted)' }}>Guest users do not have access to search history.</p>
-                <Link href="/signup" className="inline-block mt-4 btn-primary px-6 py-2 rounded-lg font-semibold">Sign Up to Start Saving</Link>
-                <div className="mt-8">
-                    <Link href="/dashboard" className="text-amber-500 hover:underline">← Back to Dashboard</Link>
+            <div className="flex items-center justify-center min-h-screen p-4">
+                <div className="card w-full max-w-lg p-8 space-y-6 text-center">
+                    <h1 className="text-3xl font-bold text-amber-500 mb-2">Search History</h1>
+                    <p style={{ color: 'var(--muted)' }}>Guest users do not have access to search history.</p>
+                    <Link href="/signup" className="block w-full btn-primary py-2.5 rounded-lg mt-4">Sign Up to Start Saving</Link>
+                    <div className="mt-4">
+                        <Link href="/dashboard" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">← Back to Dashboard</Link>
+                    </div>
                 </div>
             </div>
         );
@@ -69,18 +71,18 @@ export default function HistoryPage() {
 
     return (
         <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8">
-            <header className="flex justify-between items-center bg-transparent">
+            <header className="flex justify-between items-center bg-transparent mt-4 mb-4">
                 <div className="flex items-center gap-4">
-                    <Link href="/dashboard" className="text-sm px-3 py-1.5 rounded-lg transition-all cursor-pointer" style={{ color: 'var(--muted)', background: 'transparent', border: '1px solid var(--glass-border)' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--foreground)'; e.currentTarget.style.color = 'var(--foreground)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.color = 'var(--muted)'; }}
+                    <Link href="/dashboard" className="text-sm px-3 py-1.5 rounded-md transition-all font-medium hover:-translate-y-0.5 shadow-sm" style={{ color: 'var(--foreground)', background: 'var(--surface)', border: '1px solid var(--card-border)' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-hover)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface)'; }}
                     >
                         ← Back
                     </Link>
-                    <h1 className="text-2xl font-bold text-amber-500 dark:text-amber-400">Search History</h1>
+                    <h1 className="text-2xl font-bold text-[var(--foreground)]">Search History</h1>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-full font-medium">
+                    <span className="text-sm px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-full font-medium shadow-sm">
                         {history.length} {history.length === 1 ? 'Search' : 'Searches'}
                     </span>
                     <button onClick={toggleTheme} className="theme-toggle" title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
@@ -108,10 +110,10 @@ export default function HistoryPage() {
                                 });
                                 setHistory([]);
                             }}
-                            className="text-sm px-4 py-2 rounded-lg transition-all cursor-pointer font-medium"
-                            style={{ color: 'var(--muted)', background: 'transparent', border: '1px solid var(--glass-border)' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.background = 'transparent'; }}
+                            className="text-sm px-4 py-2 rounded-lg transition-all font-medium shadow-sm"
+                            style={{ color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--card-border)' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.background = 'var(--surface)'; }}
                         >
                             Clear All History
                         </button>
@@ -121,7 +123,7 @@ export default function HistoryPage() {
                 {history.length > 0 ? (
                     <div className="space-y-4">
                         {history.map((entry) => (
-                            <div key={entry._id} className="glass p-5 rounded-xl shadow-md border hover:border-amber-500/30 transition-all">
+                            <div key={entry._id} className="card p-5">
                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                     <button
                                         onClick={() => setExpandedHistory(expandedHistory === entry._id ? null : entry._id)}
@@ -152,10 +154,10 @@ export default function HistoryPage() {
                                                 const rerunParams = new URLSearchParams({ url: entry.url, keyword: entry.keyword, type: entry.locatorType });
                                                 router.push(`/dashboard?${rerunParams.toString()}`);
                                             }}
-                                            className="text-sm px-4 py-2 rounded-lg transition-all cursor-pointer font-medium flex items-center gap-2"
-                                            style={{ color: 'var(--muted)', background: 'transparent', border: '1px solid var(--glass-border)' }}
-                                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#f59e0b'; e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)'; }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.background = 'transparent'; }}
+                                            className="text-sm px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2 shadow-sm"
+                                            style={{ color: 'var(--foreground)', background: 'var(--surface)', border: '1px solid var(--card-border)' }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--surface-hover)'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.background = 'var(--surface)'; }}
                                             title="Re-run this search in Dashboard"
                                         >
                                             <span className="text-lg leading-none">↻</span> Re-run
@@ -169,10 +171,10 @@ export default function HistoryPage() {
                                                 });
                                                 setHistory(h => h.filter(e => e._id !== entry._id));
                                             }}
-                                            className="text-sm px-4 py-2 rounded-lg transition-all cursor-pointer font-medium hover:bg-red-500/10"
-                                            style={{ color: 'var(--muted)', background: 'transparent', border: '1px solid var(--glass-border)' }}
+                                            className="text-sm px-4 py-2 rounded-lg transition-all font-medium shadow-sm hover:bg-red-500/10"
+                                            style={{ color: 'var(--muted)', background: 'var(--surface)', border: '1px solid var(--card-border)' }}
                                             onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.color = 'var(--muted)'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.color = 'var(--muted)'; }}
                                             title="Delete this entry"
                                         >
                                             Delete
@@ -180,9 +182,8 @@ export default function HistoryPage() {
                                     </div>
                                 </div>
 
-                                {/* Expanded Results */}
                                 {expandedHistory === entry._id && entry.results.length > 0 && (
-                                    <div className="mt-5 space-y-3 pt-5" style={{ borderTop: '1px solid var(--glass-border)' }}>
+                                    <div className="mt-5 space-y-3 pt-5 border-t border-[var(--card-border)]">
                                         {entry.results.map((res, idx) => {
                                             const copyKey = `${entry._id}-${idx}`;
                                             return (
@@ -191,11 +192,10 @@ export default function HistoryPage() {
                                                     <code className="text-sm font-mono break-all flex-1 leading-relaxed" style={{ color: 'var(--muted-strong)' }}>{res.locator}</code>
                                                     <button
                                                         onClick={() => { navigator.clipboard.writeText(res.locator); setHistoryCopiedIdx(copyKey); setTimeout(() => setHistoryCopiedIdx(null), 2000); }}
-                                                        className="text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer shrink-0 font-medium"
+                                                        className="text-xs px-3 py-1.5 rounded-md transition-all font-medium border border-[var(--card-border)]"
                                                         style={{
                                                             background: historyCopiedIdx === copyKey ? 'var(--copy-btn-hover-bg)' : 'var(--copy-btn-bg)',
-                                                            color: historyCopiedIdx === copyKey ? 'var(--copy-btn-hover-text)' : 'var(--copy-btn-text)',
-                                                            border: '1px solid var(--glass-border)'
+                                                            color: historyCopiedIdx === copyKey ? 'var(--copy-btn-hover-text)' : 'var(--copy-btn-text)'
                                                         }}
                                                     >
                                                         {historyCopiedIdx === copyKey ? '✓ Copied' : 'Copy'}
@@ -209,11 +209,11 @@ export default function HistoryPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-16 glass rounded-xl border border-dashed border-amber-500/30">
-                        <span className="text-4xl mb-4 block">🕒</span>
-                        <h3 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>No history yet</h3>
-                        <p className="text-sm mt-2" style={{ color: 'var(--muted)' }}>Generate some locators on the dashboard to see your history here.</p>
-                        <Link href="/dashboard" className="inline-block mt-6 btn-primary px-6 py-2 rounded-lg font-semibold shadow-lg">Go to Dashboard</Link>
+                    <div className="text-center py-16 card shadow-sm mt-8 border-dashed border-[var(--card-border)]">
+                        <span className="text-4xl mb-4 block opacity-50">🕒</span>
+                        <h3 className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>No history yet</h3>
+                        <p className="text-sm mt-2 font-medium" style={{ color: 'var(--muted)' }}>Generate some locators on the dashboard to see your history here.</p>
+                        <Link href="/dashboard" className="inline-block mt-6 btn-primary px-6 py-2.5 rounded-lg shadow-sm">Go to Dashboard</Link>
                     </div>
                 )}
             </section>

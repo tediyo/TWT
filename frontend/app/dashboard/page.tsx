@@ -129,14 +129,7 @@ function DashboardPage() {
         <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
             <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-2xl font-bold text-amber-500 dark:text-amber-400">QA Locator Tool</h1>
-                        {!isGuest && token && (
-                            <Link href="/history" className="text-sm bg-transparent border border-amber-500/30 text-amber-500 hover:bg-amber-500/10 dark:hover:bg-amber-500/20 px-3 py-1 rounded-lg flex items-center gap-2 transition-colors font-medium">
-                                <span className="text-lg leading-none">🕒</span> History
-                            </Link>
-                        )}
-                    </div>
+                    <h1 className="text-2xl font-bold text-amber-500 dark:text-amber-400">QA Locator Tool</h1>
                     <p className="text-sm" style={{ color: 'var(--muted)' }}>
                         {isGuest ? 'Welcome, Guest' : `Welcome back, ${user?.email}`}
                     </p>
@@ -165,24 +158,29 @@ function DashboardPage() {
                             </svg>
                         )}
                     </button>
-                    <button onClick={logout} className="text-sm hover:text-red-400 transition-colors" style={{ color: 'var(--muted)' }}>
+                    {!isGuest && token && (
+                        <Link href="/history" className="text-sm border border-[var(--card-border)] bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--surface-hover)] px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all font-medium hover:-translate-y-0.5 shadow-sm whitespace-nowrap">
+                            <span className="text-lg leading-none">🕒</span> History
+                        </Link>
+                    )}
+                    <button onClick={logout} className="text-sm hover:text-red-400 transition-colors whitespace-nowrap" style={{ color: 'var(--muted)' }}>
                         Sign Out
                     </button>
                 </div>
             </header>
 
             {isGuest && (
-                <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: 'var(--badge-bg)', border: '1px solid var(--glass-border)' }}>
-                    <p className="text-sm" style={{ color: 'var(--muted-strong)' }}>
-                        👤 You&apos;re using guest mode. <span style={{ color: 'var(--muted)' }}>Sign up to save your search history.</span>
+                <div className="flex items-center justify-between p-4 rounded-xl border font-medium" style={{ background: 'var(--badge-bg)', borderColor: 'var(--card-border)' }}>
+                    <p className="text-sm" style={{ color: 'var(--tag-text)' }}>
+                        <span className="mr-2">👤</span> You&apos;re using guest mode. <span className="opacity-80">Sign up to save your search history.</span>
                     </p>
-                    <a href="/signup" className="text-sm font-semibold text-amber-500 hover:text-amber-400 dark:text-amber-400 dark:hover:text-amber-300 transition-colors whitespace-nowrap ml-4">
+                    <a href="/signup" className="text-sm font-bold text-amber-500 hover:text-amber-400 transition-colors whitespace-nowrap ml-4">
                         Sign Up →
                     </a>
                 </div>
             )}
 
-            <section className="glass p-6 md:p-8 shadow-xl">
+            <section className="card p-6 md:p-8">
                 <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div className="md:col-span-2 space-y-2">
                         <label className="text-xs font-semibold uppercase" style={{ color: 'var(--muted)' }}>Target URL</label>
@@ -237,7 +235,7 @@ function DashboardPage() {
                             🔒 Authentication (for login-protected pages)
                         </button>
                         {showAuth && (
-                            <div className="mt-3 space-y-4">
+                            <div className="mt-4 space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <label className="text-xs font-semibold uppercase" style={{ color: 'var(--muted)' }}>Site Username / Email</label>
@@ -266,7 +264,7 @@ function DashboardPage() {
                                     The tool will auto-fill and submit the login form if the site requires authentication.
                                 </p>
 
-                                <div className="pt-4 mt-2" style={{ borderTop: '1px solid var(--glass-border)' }}>
+                                <div className="pt-5 mt-4 border-t border-[var(--card-border)]">
                                     <p className="text-xs mb-3" style={{ color: 'var(--muted)' }}>Advanced: use cookies or auth tokens instead</p>
                                     <div className="space-y-4">
                                         <div className="space-y-1">
@@ -299,7 +297,7 @@ function DashboardPage() {
                         <button
                             type="submit"
                             disabled={isGenerating}
-                            className="w-full btn-primary font-bold py-3 rounded-xl transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full btn-primary py-3 rounded-lg transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {isGenerating ? (
                                 <>
@@ -356,7 +354,7 @@ function DashboardPage() {
                 {results.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4">
                         {results.map((res, idx) => (
-                            <div key={idx} className="glass p-4 flex flex-col gap-3 group transition-all" style={{ ['--tw-glass-hover' as string]: 'var(--surface-hover)' }}>
+                            <div key={idx} className="card p-5 flex flex-col gap-3">
                                 <div className="flex items-center justify-between">
                                     <span className="px-2 py-1 rounded text-xs font-mono" style={{ background: 'var(--tag-bg)', color: 'var(--tag-text)' }}>
                                         {res.tag}
@@ -375,7 +373,7 @@ function DashboardPage() {
                                     </button>
                                 </div>
                                 {isMultiLine ? (
-                                    <pre className="text-sm font-mono p-3 rounded-lg overflow-x-auto whitespace-pre-wrap break-all max-h-48 overflow-y-auto"
+                                    <pre className="text-sm font-mono p-4 rounded-md overflow-x-auto whitespace-pre-wrap break-all max-h-48 overflow-y-auto"
                                         style={{ background: 'var(--code-bg)', color: 'var(--muted-strong)' }}>
                                         {res.locator}
                                     </pre>
