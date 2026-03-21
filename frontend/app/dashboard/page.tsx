@@ -29,6 +29,7 @@ export default function DashboardOverview() {
     const router = useRouter();
     const [history, setHistory] = useState<HistoryEntry[]>([]);
     const [fetching, setFetching] = useState(true);
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     useEffect(() => {
         if (!isLoading && !user && !isGuest) {
@@ -160,14 +161,27 @@ export default function DashboardOverview() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 w-full">
                 <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>Analytics Overview</h1>
                 {!isGuest && history.length > 0 && (
-                    <div className="flex gap-2 relative group">
-                        <button className="text-sm font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2 border shadow-sm btn-primary">
+                    <div 
+                        className="flex gap-2 relative"
+                        tabIndex={-1}
+                        onBlur={(e) => {
+                            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                                setIsExportOpen(false);
+                            }
+                        }}
+                    >
+                        <button 
+                            onClick={() => setIsExportOpen(!isExportOpen)}
+                            className="text-sm font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2 border shadow-sm btn-primary"
+                        >
                             Export Data ▾
                         </button>
-                        <div className="absolute right-0 top-full mt-2 w-32 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10" style={{ background: 'var(--surface)', borderColor: 'var(--card-border)' }}>
-                            <button onClick={() => handleExport('csv')} className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition-colors first:rounded-t-lg" style={{ color: 'var(--foreground)' }}>Export CSV</button>
-                            <button onClick={() => handleExport('json')} className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition-colors last:rounded-b-lg" style={{ color: 'var(--foreground)' }}>Export JSON</button>
-                        </div>
+                        {isExportOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-32 rounded-lg shadow-lg border transition-all z-10" style={{ background: 'var(--surface)', borderColor: 'var(--card-border)' }}>
+                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => { handleExport('csv'); setIsExportOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition-colors first:rounded-t-lg" style={{ color: 'var(--foreground)' }}>Export CSV</button>
+                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => { handleExport('json'); setIsExportOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5 transition-colors last:rounded-b-lg" style={{ color: 'var(--foreground)' }}>Export JSON</button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
