@@ -27,7 +27,7 @@ export class UsersService {
         return this.userModel.findOne({ googleId }).exec();
     }
 
-    async findOrCreateGoogleUser(profile: { email: string; googleId: string }): Promise<UserDocument> {
+    async findOrCreateGoogleUser(profile: { email: string; googleId: string; fullName: string }): Promise<UserDocument> {
         // Check if user exists by googleId
         let user = await this.findOneByGoogleId(profile.googleId);
         if (user) return user;
@@ -41,8 +41,9 @@ export class UsersService {
 
         // Create new Google user (no password)
         return this.create({
+            fullName: profile.fullName,
             email: profile.email,
             googleId: profile.googleId,
-        } as any);
+        });
     }
 }

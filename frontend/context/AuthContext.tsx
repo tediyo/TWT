@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(false);
     }, []);
 
-    const login = (newToken: string, newUser: User) => {
+    const login = useCallback((newToken: string, newUser: User) => {
         setToken(newToken);
         setUser(newUser);
         setIsGuest(false);
@@ -64,17 +64,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         safeStorage.setItem('local', 'user', JSON.stringify(newUser));
         safeStorage.removeItem('session', 'isGuest');
         router.push('/dashboard');
-    };
+    }, [router]);
 
-    const loginAsGuest = () => {
+    const loginAsGuest = useCallback(() => {
         setToken(null);
         setUser(null);
         setIsGuest(true);
         safeStorage.setItem('session', 'isGuest', 'true');
         router.push('/dashboard');
-    };
+    }, [router]);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setToken(null);
         setUser(null);
         setIsGuest(false);
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         safeStorage.removeItem('local', 'user');
         safeStorage.removeItem('session', 'isGuest');
         router.push('/login');
-    };
+    }, [router]);
 
     return (
         <AuthContext.Provider value={{ user, token, isGuest, login, loginAsGuest, logout, isLoading }}>
