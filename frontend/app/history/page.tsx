@@ -147,8 +147,8 @@ export default function HistoryPage() {
                                                 {new Date(entry.createdAt).toLocaleDateString()} at {new Date(entry.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </div>
-                                    </button>
-                                    <div className="flex items-center gap-2 shrink-0 mdSelf-start self-end">
+                                     </button>
+                                    <div className="flex flex-wrap items-center gap-2 shrink-0 md:self-start self-end mt-2 md:mt-0">
                                         <button
                                             onClick={() => { 
                                                 const rerunParams = new URLSearchParams({ url: entry.url, keyword: entry.keyword, type: entry.locatorType });

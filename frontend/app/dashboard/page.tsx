@@ -157,7 +157,7 @@ export default function DashboardOverview() {
 
     return (
         <DashboardLayout>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 w-full">
                 <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>Analytics Overview</h1>
                 {!isGuest && history.length > 0 && (
                     <div className="flex gap-2 relative group">
@@ -292,24 +292,29 @@ export default function DashboardOverview() {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="border-b" style={{ borderColor: 'var(--card-border)', color: 'var(--muted)' }}>
-                                            <th className="pb-3 text-xs uppercase font-semibold">Keyword</th>
-                                            <th className="pb-3 text-xs uppercase font-semibold">URL</th>
-                                            <th className="pb-3 text-xs uppercase font-semibold">Type</th>
-                                            <th className="pb-3 text-xs uppercase font-semibold">Results</th>
-                                            <th className="pb-3 text-xs uppercase font-semibold text-right">Action</th>
+                                            <th className="pb-3 text-xs uppercase font-semibold whitespace-nowrap">Keyword</th>
+                                            <th className="pb-3 text-xs uppercase font-semibold whitespace-nowrap hidden sm:table-cell">URL</th>
+                                            <th className="pb-3 text-xs uppercase font-semibold whitespace-nowrap">Type</th>
+                                            <th className="pb-3 text-xs uppercase font-semibold whitespace-nowrap text-center hidden sm:table-cell">Results</th>
+                                            <th className="pb-3 text-xs uppercase font-semibold whitespace-nowrap text-right">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="text-sm">
                                         {history.slice(0, 5).map((entry) => (
                                             <tr key={entry._id} className="border-b last:border-0 hover:bg-black/5 dark:hover:bg-white/5 transition-colors" style={{ borderColor: 'var(--card-border)' }}>
-                                                <td className="py-3 font-medium text-sm" style={{ color: 'var(--foreground)' }}>{entry.keyword}</td>
-                                                <td className="py-3 text-sm truncate max-w-[200px]" style={{ color: 'var(--muted)' }}>{entry.url}</td>
-                                                <td className="py-3 text-xs">
-                                                    <span className="px-2 py-1 rounded bg-black/5 dark:bg-white/10" style={{ color: 'var(--muted-strong)' }}>
+                                                <td className="py-4 pr-4">
+                                                    <span className="font-medium px-2 py-1 rounded bg-black/5 dark:bg-white/10" style={{ color: 'var(--foreground)' }}>
+                                                        {entry.keyword}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 pr-4 max-w-[200px] truncate hidden sm:table-cell" style={{ color: 'var(--muted)' }}>
+                                                    {new URL(entry.url).hostname}
+                                                </td>
+                                                <td className="py-4 pr-4">
+                                                    <span className="text-xs font-semibold px-2 py-1 rounded-full border shrink-0" style={{ borderColor: 'var(--card-border)', color: 'var(--muted)' }}>
                                                         {entry.locatorType}
                                                     </span>
                                                 </td>
-                                                <td className="py-3 text-sm font-medium" style={{ color: 'var(--muted-strong)' }}>{entry.results.length}</td>
                                                 <td className="py-3 text-right">
                                                     <Link 
                                                         href={`/dashboard/locator?url=${encodeURIComponent(entry.url)}&keyword=${encodeURIComponent(entry.keyword)}&type=${encodeURIComponent(entry.locatorType)}`}

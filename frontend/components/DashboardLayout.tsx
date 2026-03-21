@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </Link>
                 </nav>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 mt-2 sm:mt-0">
                     <button
                         onClick={toggleTheme}
                         className="theme-toggle"
